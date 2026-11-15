@@ -2,6 +2,8 @@ package com.example.irremote.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.irremote.data.local.ReadymadeRemotes
+import com.example.irremote.data.local.entity.RemoteButton
 import com.example.irremote.data.local.entity.RemoteDevice
 import com.example.irremote.repository.RemoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,14 +27,41 @@ class MainViewModel @Inject constructor(
         repository.connectUsb()
     }
 
-    fun addPreloadedDevice() {
+    fun addBlankDevice(name: String, type: String) {
         viewModelScope.launch {
-            val samsungTv = RemoteDevice(
-                deviceName = "Generic Samsung TV",
-                deviceType = "TV"
-            )
-            repository.insertDevice(samsungTv)
-            // In a full implementation, you might pre-populate standard NEC buttons here as well.
+            repository.insertDevice(RemoteDevice(deviceName = name, deviceType = type))
+        }
+    }
+
+    fun addReadymadeDevice(template: ReadymadeRemotes.Template) {
+        viewModelScope.launch {
+            val deviceId = repository.insertDevice(
+                RemoteDevice(deviceName = template.name, deviceType = template.type)
+            ).toInt()
+
+            val buttons = template.buttons.map { def ->
+                RemoteButton(
+                    deviceId = deviceId,
+                    buttonLabel = def.label,
+                    protocol = "NEC",
+                    addressHex = def.address,
+                    commandHex = def.command,
+                    rawArrayData = null
+                )
+            }
+            repository.insertButtons(buttons)
+        }
+    }
+
+    fun renameDevice(device: RemoteDevice, newName: String) {
+        viewModelScope.launch {
+            repository.updateDevice(device.copy(deviceName = newName))
+        }
+    }
+
+    fun deleteDevice(device: RemoteDevice) {
+        viewModelScope.launch {
+            repository.deleteDevice(device)
         }
     }
 }
