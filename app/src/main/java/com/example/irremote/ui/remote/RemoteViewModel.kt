@@ -88,4 +88,16 @@ class RemoteViewModel @Inject constructor(
             exitLearningMode()
         }
     }
+
+    fun renameButton(button: RemoteButton, newLabel: String) {
+        viewModelScope.launch {
+            repository.updateButton(button.copy(buttonLabel = newLabel))
+        }
+    }
+
+    fun deleteButton(button: RemoteButton) {
+        viewModelScope.launch {
+            repository.deleteButton(button)
+        }
+    }
 }
