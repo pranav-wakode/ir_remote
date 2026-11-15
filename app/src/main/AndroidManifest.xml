@@ -7,6 +7,8 @@
     <application
         android:name=".IrRemoteApp"
         android:allowBackup="true"
+        android:icon="@drawable/ic_app_logo"
+        android:roundIcon="@drawable/ic_app_logo"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.IrRemote">
